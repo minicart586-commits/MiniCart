@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "920058897052",
+    "project_id": "minicart-513e8",
+    "storage_bucket": "minicart-513e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920058897052:android:e722d4a2ef26a867704359",
+        "android_client_info": {
+          "package_name": "uk.ac.tees.mad.minicart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt1Y_fKIYpLC-bWwY3zDpm3Gx5EwP0X44"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
