@@ -4,11 +4,12 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import uk.ac.tees.mad.minicart.data.RepoImpl
+import uk.ac.tees.mad.minicart.data.Repo
+
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
 
-class RepoImpl: RepoImpl {
+class RepoImpl: Repo {
     private val auth = FirebaseAuth.getInstance()
     override fun registeruserwithemailandpassword(
         userdata: UserData
