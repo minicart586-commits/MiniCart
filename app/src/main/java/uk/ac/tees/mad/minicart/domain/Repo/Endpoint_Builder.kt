@@ -7,7 +7,6 @@ import uk.ac.tees.mad.minicart.model.product
 import uk.ac.tees.mad.minicart.model.productItem
 
 interface Endpoint_Builder {
-@FormUrlEncoded
 @GET("products")
 suspend fun getProducts(): product
 

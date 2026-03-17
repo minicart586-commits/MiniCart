@@ -8,6 +8,8 @@ import uk.ac.tees.mad.minicart.data.Repo
 
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
+import uk.ac.tees.mad.minicart.model.product
+import uk.ac.tees.mad.minicart.model.productItem
 
 class RepoImpl: Repo {
     private val auth = FirebaseAuth.getInstance()
@@ -72,6 +74,26 @@ class RepoImpl: Repo {
             }
 
         awaitClose { close() }
+    }
+
+    override fun getproducts(): Flow<ResultState<product>> = kotlinx.coroutines.flow.flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiBuilder.provedApi.getProducts()
+            emit(ResultState.Succes(response))
+        } catch (e: Exception) {
+            emit(ResultState.error(e.localizedMessage ?: "Unknown error"))
+        }
+    }
+
+    override fun getproductItem(id: Int): Flow<ResultState<productItem>> = kotlinx.coroutines.flow.flow {
+        emit(ResultState.Loading)
+        try {
+            val response = ApiBuilder.provedApi.getProductById(id)
+            emit(ResultState.Succes(response))
+        } catch (e: Exception) {
+            emit(ResultState.error(e.localizedMessage ?: "Unknown error"))
+        }
     }
 
 

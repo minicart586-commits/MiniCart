@@ -7,6 +7,8 @@ import kotlinx.coroutines.launch
 import uk.ac.tees.mad.minicart.data.Repo
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
+import uk.ac.tees.mad.minicart.model.product
+import uk.ac.tees.mad.minicart.model.productItem
 
 data class SignUpScreenState(
     val isLoading: Boolean = false,
@@ -19,6 +21,20 @@ data class LogInScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val userdata: String? = null,
+    val success: Boolean = false
+)
+
+data class ProductsScreenState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val products: product? = null,
+    val success: Boolean = false
+)
+
+data class ProductItemScreenState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val productItem: productItem? = null,
     val success: Boolean = false
 )
 
@@ -87,5 +103,57 @@ class AppViewModel(
 
     fun resetSignupState() {
         _signupScreenState.value = SignUpScreenState()
+    }
+
+    private val _productsScreenState = mutableStateOf(ProductsScreenState())
+    val productsScreenState = _productsScreenState
+
+    fun getProducts() {
+        viewModelScope.launch {
+            repo.getproducts().collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _productsScreenState.value = ProductsScreenState(isLoading = true)
+                    }
+                    is ResultState.Succes -> {
+                        _productsScreenState.value = ProductsScreenState(
+                            success = true,
+                            products = result.data
+                        )
+                    }
+                    is ResultState.error -> {
+                        _productsScreenState.value = ProductsScreenState(
+                            error = result.message
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private val _productItemScreenState = mutableStateOf(ProductItemScreenState())
+    val productItemScreenState = _productItemScreenState
+
+    fun getProductItem(id: Int) {
+        viewModelScope.launch {
+            repo.getproductItem(id).collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _productItemScreenState.value = ProductItemScreenState(isLoading = true)
+                    }
+                    is ResultState.Succes -> {
+                        _productItemScreenState.value = ProductItemScreenState(
+                            success = true,
+                            productItem = result.data
+                        )
+                    }
+                    is ResultState.error -> {
+                        _productItemScreenState.value = ProductItemScreenState(
+                            error = result.message
+                        )
+                    }
+                }
+            }
+        }
     }
 }
