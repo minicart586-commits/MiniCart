@@ -27,7 +27,17 @@ fun AppNav(
                 }
             )
         }
-        
+        composable(NavRoutes.HOME) {
+            if (appViewModel != null) {
+                uk.ac.tees.mad.minicart.ui.screens.HomeScreen(
+                    viewModel = appViewModel,
+                    onProductClick = { productId ->
+                        // TODO: Navigate to Cart & Checkout Screen with productId
+                    }
+                )
+            }
+        }
+
 
     }
 }
