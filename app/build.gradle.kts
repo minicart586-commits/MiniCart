@@ -67,4 +67,9 @@ dependencies {
 
     implementation ("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.compose.material:material-icons-extended:1.4.0-alpha01")
+    implementation("com.squareup.retrofit2:retrofit:2.10.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.10.0")
+//    implementation("com.squareup.okhttp:okhttp:2.7.3")
+ implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
+    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
 }
