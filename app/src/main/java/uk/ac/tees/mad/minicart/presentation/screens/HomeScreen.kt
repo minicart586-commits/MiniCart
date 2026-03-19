@@ -1,4 +1,4 @@
-package uk.ac.tees.mad.minicart.ui.screens
+package uk.ac.tees.mad.minicart.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
