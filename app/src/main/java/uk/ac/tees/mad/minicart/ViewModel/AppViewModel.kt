@@ -78,7 +78,7 @@ class AppViewModel(
     private val _signupScreenState = mutableStateOf(SignUpScreenState())
     val signupScreenState = _signupScreenState
 
-    fun registerUser(userData: UserData) {
+    fun  registerUser(userData: UserData) {
         viewModelScope.launch {
             repo.registeruserwithemailandpassword(userData).collect { result ->
                 when (result) {

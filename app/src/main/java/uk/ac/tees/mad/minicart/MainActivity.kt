@@ -11,24 +11,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import uk.ac.tees.mad.minicart.presentation.naivagation.AppNav
 import uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
+import uk.ac.tees.mad.minicart.domain.Repo.RepoImpl
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        
+        val repo = RepoImpl()
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return AppViewModel(repo) as T
+            }
+        }
+        val appViewModel = ViewModelProvider(this, factory)[AppViewModel::class.java]
+        
         setContent {
             MiniCartTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNav(appViewModel = appViewModel)
             }
         }
     }
 }
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

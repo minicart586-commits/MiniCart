@@ -20,6 +20,7 @@ fun AppNav(
         composable(NavRoutes.LOGIN) {
             AuthScreen(
                 viewModel = appViewModel,
+                initialIsLogin = true,
                 onLoginSuccess = {
                     navController.navigate(NavRoutes.HOME) {
                         popUpTo(NavRoutes.LOGIN) { inclusive = true }
@@ -27,9 +28,20 @@ fun AppNav(
                 }
             )
         }
+        composable(NavRoutes.SIGNUP) {
+            AuthScreen(
+                viewModel = appViewModel,
+                initialIsLogin = false,
+                onLoginSuccess = {
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.SIGNUP) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(NavRoutes.HOME) {
             if (appViewModel != null) {
-                uk.ac.tees.mad.minicart.ui.screens.HomeScreen(
+                uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
                     viewModel = appViewModel,
                     onProductClick = { productId ->
                         // TODO: Navigate to Cart & Checkout Screen with productId

@@ -23,9 +23,10 @@ import uk.ac.tees.mad.minicart.model.UserData
 @Composable
 fun AuthScreen(
     viewModel: AppViewModel? = null,
+    initialIsLogin: Boolean = true,
     onLoginSuccess: () -> Unit = {}
 ) {
-    var isLogin by remember { mutableStateOf(true) }
+    var isLogin by remember { mutableStateOf(initialIsLogin) }
 
     val loginState = viewModel?.loginScreenState?.value
     val signupState = viewModel?.signupScreenState?.value
@@ -41,13 +42,10 @@ fun AuthScreen(
         onToggleMode = { isLogin = !isLogin },
         isLoading = if (isLogin) loginState?.isLoading == true else signupState?.isLoading == true,
         errorMessage = if (isLogin) loginState?.error else signupState?.error,
-        onSubmit = { name, email, password, phone, income ->
+        onSubmit = { email, password ->
             val userData = UserData(
                 email = email,
-                password = password,
-                name = name,
-                phoneNumber = phone,
-                income = income
+                password = password
             )
             if (isLogin) {
                 viewModel?.loginUser(userData)
@@ -64,13 +62,10 @@ fun AuthScreenContent(
     onToggleMode: () -> Unit,
     isLoading: Boolean,
     errorMessage: String?,
-    onSubmit: (String, String, String, String, String) -> Unit
+    onSubmit: (String, String) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var income by remember { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -86,15 +81,6 @@ fun AuthScreenContent(
             style = MaterialTheme.typography.headlineLarge,
             modifier = Modifier.padding(bottom = 32.dp)
         )
-
-        if (!isLogin) {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-            )
-        }
 
         OutlinedTextField(
             value = email,
@@ -116,27 +102,8 @@ fun AuthScreenContent(
                     Icon(imageVector = image, contentDescription = if (passwordVisible) "Hide password" else "Show password")
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
         )
-
-        if (!isLogin) {
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { phone = it },
-                label = { Text("Phone Number") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-            )
-            OutlinedTextField(
-                value = income,
-                onValueChange = { income = it },
-                label = { Text("Income (Optional)") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-            )
-        } else {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
 
         if (errorMessage != null) {
             Text(
@@ -147,7 +114,7 @@ fun AuthScreenContent(
         }
 
         Button(
-            onClick = { onSubmit(name, email, password, phone, income) },
+            onClick = { onSubmit(email, password) },
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
             enabled = !isLoading
         ) {
@@ -180,7 +147,7 @@ fun AuthScreenLoginPreview() {
             onToggleMode = {},
             isLoading = false,
             errorMessage = null,
-            onSubmit = { _, _, _, _, _ -> }
+            onSubmit = { _, _ -> }
         )
     }
 }
@@ -194,7 +161,7 @@ fun AuthScreenRegisterPreview() {
             onToggleMode = {},
             isLoading = false,
             errorMessage = null,
-            onSubmit = { _, _, _, _, _ -> }
+            onSubmit = { _, _ -> }
         )
     }
 }
