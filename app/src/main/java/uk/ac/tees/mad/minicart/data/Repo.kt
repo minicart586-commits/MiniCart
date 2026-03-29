@@ -9,6 +9,6 @@ import uk.ac.tees.mad.minicart.model.productItem
 interface Repo {
     fun registeruserwithemailandpassword(userdata: UserData): Flow<ResultState<String>>
     fun loginuserwithemailandpassword(userdata: UserData): Flow<ResultState<String>>
-    fun getproducts(): Flow<ResultState<product>>
+    fun getproducts(): Flow<ResultState<List<productItem>>>
     fun getproductItem(id: Int): Flow<ResultState<productItem>>
 }

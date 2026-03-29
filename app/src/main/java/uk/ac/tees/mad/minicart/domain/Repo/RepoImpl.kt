@@ -1,5 +1,7 @@
 package uk.ac.tees.mad.minicart.domain.Repo
 
+import android.util.Log
+
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -8,7 +10,6 @@ import uk.ac.tees.mad.minicart.data.Repo
 
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
-import uk.ac.tees.mad.minicart.model.product
 import uk.ac.tees.mad.minicart.model.productItem
 
 class RepoImpl: Repo {
@@ -76,12 +77,14 @@ class RepoImpl: Repo {
         awaitClose { close() }
     }
 
-    override fun getproducts(): Flow<ResultState<product>> = kotlinx.coroutines.flow.flow {
+    override fun getproducts(): Flow<ResultState<List<productItem>>> = kotlinx.coroutines.flow.flow {
         emit(ResultState.Loading)
         try {
             val response = ApiBuilder.provedApi.getProducts()
+            Log.d("RepoImpl", "Products fetched successfully: ${response.size} items")
             emit(ResultState.Succes(response))
         } catch (e: Exception) {
+            Log.e("RepoImpl", "Error fetching products", e)
             emit(ResultState.error(e.localizedMessage ?: "Unknown error"))
         }
     }
@@ -90,8 +93,10 @@ class RepoImpl: Repo {
         emit(ResultState.Loading)
         try {
             val response = ApiBuilder.provedApi.getProductById(id)
+            Log.d("RepoImpl", "Product item fetched successfully: ${response.id}")
             emit(ResultState.Succes(response))
         } catch (e: Exception) {
+            Log.e("RepoImpl", "Error fetching product item $id", e)
             emit(ResultState.error(e.localizedMessage ?: "Unknown error"))
         }
     }

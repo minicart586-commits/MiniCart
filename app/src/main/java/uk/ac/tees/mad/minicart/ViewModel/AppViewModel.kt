@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import uk.ac.tees.mad.minicart.data.Repo
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
-import uk.ac.tees.mad.minicart.model.product
 import uk.ac.tees.mad.minicart.model.productItem
 
 data class SignUpScreenState(
@@ -27,7 +26,7 @@ data class LogInScreenState(
 data class ProductsScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
-    val products: product? = null,
+    val products: List<productItem>? = null,
     val success: Boolean = false
 )
 

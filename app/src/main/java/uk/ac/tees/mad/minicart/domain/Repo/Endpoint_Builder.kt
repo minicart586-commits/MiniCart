@@ -8,7 +8,7 @@ import uk.ac.tees.mad.minicart.model.productItem
 
 interface Endpoint_Builder {
 @GET("products")
-suspend fun getProducts(): product
+suspend fun getProducts(): List<productItem>
 
     @GET("products/{id}")
     suspend fun getProductById(

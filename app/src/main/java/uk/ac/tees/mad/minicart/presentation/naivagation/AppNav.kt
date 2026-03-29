@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
 import uk.ac.tees.mad.minicart.presentation.screens.AuthScreen
 
@@ -13,9 +14,10 @@ fun AppNav(
     navController: NavHostController = rememberNavController(),
     appViewModel: AppViewModel? = null
 ) {
+    val auth= FirebaseAuth.getInstance().currentUser
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.LOGIN
+        startDestination = if (auth != null) NavRoutes.HOME else NavRoutes.LOGIN
     ) {
         composable(NavRoutes.LOGIN) {
             AuthScreen(
@@ -42,14 +44,10 @@ fun AppNav(
         composable(NavRoutes.HOME) {
             if (appViewModel != null) {
                 uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
-                    viewModel = appViewModel,
-                    onProductClick = { productId ->
-                        // TODO: Navigate to Cart & Checkout Screen with productId
-                    }
+                    viewModel = appViewModel
                 )
             }
         }
-
-
     }
 }
+
