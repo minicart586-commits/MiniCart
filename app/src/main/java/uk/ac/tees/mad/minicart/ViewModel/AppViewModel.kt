@@ -8,6 +8,7 @@ import uk.ac.tees.mad.minicart.data.Repo
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
 import uk.ac.tees.mad.minicart.model.productItem
+import uk.ac.tees.mad.minicart.model.CartItem
 
 data class SignUpScreenState(
     val isLoading: Boolean = false,
@@ -34,6 +35,12 @@ data class ProductItemScreenState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val productItem: productItem? = null,
+    val success: Boolean = false
+)
+
+data class OrderScreenState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
     val success: Boolean = false
 )
 
@@ -154,5 +161,64 @@ class AppViewModel(
                 }
             }
         }
+    }
+
+    private val _cartItems = mutableStateOf<List<CartItem>>(emptyList())
+    val cartItems = _cartItems
+
+    fun addToCart(product: productItem) {
+        val currentItems = _cartItems.value.toMutableList()
+        val existingItem = currentItems.find { it.product.id == product.id }
+        if (existingItem != null) {
+            val index = currentItems.indexOf(existingItem)
+            currentItems[index] = existingItem.copy(quantity = existingItem.quantity + 1)
+        } else {
+            currentItems.add(CartItem(product))
+        }
+        _cartItems.value = currentItems
+    }
+
+    fun removeFromCart(product: productItem) {
+        val currentItems = _cartItems.value.toMutableList()
+        val existingItem = currentItems.find { it.product.id == product.id }
+        if (existingItem != null) {
+            if (existingItem.quantity > 1) {
+                val index = currentItems.indexOf(existingItem)
+                currentItems[index] = existingItem.copy(quantity = existingItem.quantity - 1)
+            } else {
+                currentItems.remove(existingItem)
+            }
+        }
+        _cartItems.value = currentItems
+    }
+
+    fun clearCart() {
+        _cartItems.value = emptyList()
+    }
+
+    private val _orderState = mutableStateOf(OrderScreenState())
+    val orderState = _orderState
+
+    fun placeOrder() {
+        viewModelScope.launch {
+            repo.placeOrder(_cartItems.value).collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _orderState.value = OrderScreenState(isLoading = true)
+                    }
+                    is ResultState.Succes -> {
+                        _orderState.value = OrderScreenState(success = true)
+                        clearCart()
+                    }
+                    is ResultState.error -> {
+                        _orderState.value = OrderScreenState(error = result.message)
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetOrderState() {
+        _orderState.value = OrderScreenState()
     }
 }

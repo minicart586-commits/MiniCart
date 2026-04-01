@@ -3,6 +3,7 @@ package uk.ac.tees.mad.minicart.domain.Repo
 import android.util.Log
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -10,6 +11,7 @@ import uk.ac.tees.mad.minicart.data.Repo
 
 import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
+import uk.ac.tees.mad.minicart.model.CartItem
 import uk.ac.tees.mad.minicart.model.productItem
 
 class RepoImpl: Repo {
@@ -101,5 +103,33 @@ class RepoImpl: Repo {
         }
     }
 
+    override fun placeOrder(cartItems: List<CartItem>): Flow<ResultState<String>> = callbackFlow {
+        trySend(ResultState.Loading)
+        val user = auth.currentUser
+        if (user == null) {
+            trySend(ResultState.error("User not logged in"))
+            close()
+            return@callbackFlow
+        }
 
+        val db = FirebaseFirestore.getInstance()
+        val order = hashMapOf(
+            "userId" to user.uid,
+            "items" to cartItems,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        db.collection("orders")
+            .add(order)
+            .addOnSuccessListener {
+                trySend(ResultState.Succes("Order placed successfully"))
+                close()
+            }
+            .addOnFailureListener { e ->
+                trySend(ResultState.error(e.localizedMessage ?: "Failed to place order"))
+                close()
+            }
+        
+        awaitClose()
+    }
 }

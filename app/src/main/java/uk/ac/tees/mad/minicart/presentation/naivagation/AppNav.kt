@@ -44,7 +44,16 @@ fun AppNav(
         composable(NavRoutes.HOME) {
             if (appViewModel != null) {
                 uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
-                    viewModel = appViewModel
+                    viewModel = appViewModel,
+                    onCartClick = { navController.navigate(NavRoutes.CART) }
+                )
+            }
+        }
+        composable(NavRoutes.CART) {
+            if (appViewModel != null) {
+                uk.ac.tees.mad.minicart.presentation.screens.CartScreen(
+                    viewModel = appViewModel,
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }

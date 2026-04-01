@@ -21,13 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ShoppingCart
 import coil3.compose.AsyncImage
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
 import uk.ac.tees.mad.minicart.model.productItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: AppViewModel,
+    onCartClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.productsScreenState
@@ -40,54 +44,75 @@ fun HomeScreen(
         viewModel.getProducts()
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        when {
-            state.isLoading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            state.error != null -> {
-                Text(
-                    text = state.error ?: "Unknown Error",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-            state.products != null -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(state.products!!) { product ->
-                        ProductCard(
-                            product = product,
-                            onClick = { 
-                                selectedProduct = product
-                                showDialog = true
-                            },
-                            onAddToCart = { 
-                                selectedProduct = product
-                                showDialog = true
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("MiniCart") },
+                actions = {
+                    IconButton(onClick = onCartClick) {
+                        val cartItems by viewModel.cartItems
+                        BadgedBox(
+                            badge = {
+                                if (cartItems.isNotEmpty()) {
+                                    Badge { Text(cartItems.sumOf { it.quantity }.toString()) }
+                                }
                             }
-                        )
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                        }
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(modifier = modifier.padding(paddingValues).fillMaxSize()) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                state.error != null -> {
+                    Text(
+                        text = state.error ?: "Unknown Error",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+                state.products != null -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(state.products!!) { product ->
+                            ProductCard(
+                                product = product,
+                                onClick = { 
+                                    selectedProduct = product
+                                    showDialog = true
+                                },
+                                onAddToCart = { 
+                                    viewModel.addToCart(product)
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (showDialog && selectedProduct != null) {
-            ProductDetailDialog(
-                product = selectedProduct!!,
-                onDismiss = { showDialog = false },
-                onAddToCart = { 
-                    /* Add to cart logic */
-                    showDialog = false 
-                }
-            )
+            if (showDialog && selectedProduct != null) {
+                ProductDetailDialog(
+                    product = selectedProduct!!,
+                    onDismiss = { showDialog = false },
+                    onAddToCart = { 
+                        viewModel.addToCart(selectedProduct!!)
+                        showDialog = false 
+                    }
+                )
+            }
         }
     }
 }
