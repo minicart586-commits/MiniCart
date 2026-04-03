@@ -7,4 +7,5 @@ object NavRoutes {
     const val SIGNUP = "signup"
     const val HOME = "home"
     const val CART = "cart"
+    const val SETTINGS = "settings"
 }
