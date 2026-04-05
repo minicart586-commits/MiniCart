@@ -45,7 +45,8 @@ fun AppNav(
             if (appViewModel != null) {
                 uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
                     viewModel = appViewModel,
-                    onCartClick = { navController.navigate(NavRoutes.CART) }
+                    onCartClick = { navController.navigate(NavRoutes.CART) },
+                    onSettingsClick = { navController.navigate(NavRoutes.SETTINGS) }
                 )
             }
         }
@@ -54,6 +55,22 @@ fun AppNav(
                 uk.ac.tees.mad.minicart.presentation.screens.CartScreen(
                     viewModel = appViewModel,
                     onBackClick = { navController.popBackStack() }
+                )
+            }
+        }
+        composable(NavRoutes.SETTINGS) {
+            if (appViewModel != null) {
+                uk.ac.tees.mad.minicart.presentation.screens.SettingsScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onLogoutClick = {
+                        appViewModel.signout()
+                        navController.navigate(NavRoutes.LOGIN) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    onClearCacheClick = {
+                        // For now, just add the button
+                    }
                 )
             }
         }

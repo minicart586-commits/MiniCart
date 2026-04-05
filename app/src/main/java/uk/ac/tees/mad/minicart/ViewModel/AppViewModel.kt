@@ -3,6 +3,7 @@ package uk.ac.tees.mad.minicart.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.minicart.data.Repo
 import uk.ac.tees.mad.minicart.model.ResultState
@@ -51,6 +52,8 @@ class AppViewModel(
 
     private val _loginScreenState = mutableStateOf(LogInScreenState())
     val loginScreenState = _loginScreenState
+    val auth= FirebaseAuth.getInstance()
+
 
     fun loginUser(userData: UserData) {
         viewModelScope.launch {
@@ -220,5 +223,9 @@ class AppViewModel(
 
     fun resetOrderState() {
         _orderState.value = OrderScreenState()
+    }
+    fun signout(){
+        auth.signOut()
+
     }
 }

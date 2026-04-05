@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import coil3.compose.AsyncImage
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
@@ -32,6 +33,7 @@ import uk.ac.tees.mad.minicart.model.productItem
 fun HomeScreen(
     viewModel: AppViewModel,
     onCartClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.productsScreenState
@@ -60,6 +62,9 @@ fun HomeScreen(
                         ) {
                             Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
                         }
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
                 }
             )
