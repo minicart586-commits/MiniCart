@@ -119,7 +119,9 @@ class RepoImpl: Repo {
             "timestamp" to System.currentTimeMillis()
         )
 
-        db.collection("orders")
+        db.collection("users")
+            .document(user.uid)
+            .collection("records")
             .add(order)
             .addOnSuccessListener {
                 trySend(ResultState.Succes("Order placed successfully"))
