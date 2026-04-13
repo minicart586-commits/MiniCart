@@ -13,5 +13,5 @@ interface Repo {
     fun getproducts(): Flow<ResultState<List<productItem>>>
     fun getproductItem(id: Int): Flow<ResultState<productItem>>
     fun placeOrder(cartItems: List<CartItem>): Flow<ResultState<String>>
-
+    fun clearCache(): Flow<ResultState<String>>
 }

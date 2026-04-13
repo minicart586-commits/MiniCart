@@ -135,5 +135,19 @@ class RepoImpl: Repo {
         awaitClose()
     }
 
+    override fun clearCache(): Flow<ResultState<String>> = callbackFlow {
+        trySend(ResultState.Loading)
+        FirebaseFirestore.getInstance().clearPersistence()
+            .addOnSuccessListener {
+                trySend(ResultState.Succes("Cache cleared successfully"))
+                close()
+            }
+            .addOnFailureListener { e ->
+                trySend(ResultState.error(e.localizedMessage ?: "Failed to clear cache"))
+                close()
+            }
+        awaitClose()
+    }
+
 
 }

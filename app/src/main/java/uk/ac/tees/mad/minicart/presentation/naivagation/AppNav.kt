@@ -61,6 +61,8 @@ fun AppNav(
         composable(NavRoutes.SETTINGS) {
             if (appViewModel != null) {
                 uk.ac.tees.mad.minicart.presentation.screens.SettingsScreen(
+                    orderState = appViewModel.orderState.value,
+                    onResetOrderState = { appViewModel.resetOrderState() },
                     onBackClick = { navController.popBackStack() },
                     onLogoutClick = {
                         appViewModel.signout()
@@ -69,7 +71,7 @@ fun AppNav(
                         }
                     },
                     onClearCacheClick = {
-                        // For now, just add the button
+                        appViewModel.clearCache()
                     }
                 )
             }

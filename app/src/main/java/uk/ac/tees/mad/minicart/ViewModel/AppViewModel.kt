@@ -224,8 +224,26 @@ class AppViewModel(
     fun resetOrderState() {
         _orderState.value = OrderScreenState()
     }
-    fun signout(){
-        auth.signOut()
 
+    fun signout() {
+        auth.signOut()
+    }
+
+    fun clearCache() {
+        viewModelScope.launch {
+            repo.clearCache().collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _orderState.value = OrderScreenState(isLoading = true)
+                    }
+                    is ResultState.Succes -> {
+                        _orderState.value = OrderScreenState(success = true)
+                    }
+                    is ResultState.error -> {
+                        _orderState.value = OrderScreenState(error = result.message)
+                    }
+                }
+            }
+        }
     }
 }
