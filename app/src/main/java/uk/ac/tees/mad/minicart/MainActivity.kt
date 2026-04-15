@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         val repo = RepoImpl()
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return AppViewModel(repo) as T
+                return AppViewModel(repo, application) as T
             }
         }
         val appViewModel = ViewModelProvider(this, factory)[AppViewModel::class.java]

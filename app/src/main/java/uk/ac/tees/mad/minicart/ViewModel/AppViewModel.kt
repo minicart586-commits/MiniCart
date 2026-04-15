@@ -1,9 +1,13 @@
 package uk.ac.tees.mad.minicart.ViewModel
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.minicart.data.Repo
 import uk.ac.tees.mad.minicart.model.ResultState
@@ -46,9 +50,16 @@ data class OrderScreenState(
 )
 
 class AppViewModel(
-    val repo: Repo
+    val repo: Repo,
+    private val application: Application
 ) : ViewModel() {
 
+    private val gson = Gson()
+    private val prefs = application.getSharedPreferences("cart_prefs", Context.MODE_PRIVATE)
+
+    init {
+        loadCart()
+    }
 
     private val _loginScreenState = mutableStateOf(LogInScreenState())
     val loginScreenState = _loginScreenState
@@ -169,6 +180,24 @@ class AppViewModel(
     private val _cartItems = mutableStateOf<List<CartItem>>(emptyList())
     val cartItems = _cartItems
 
+    private fun saveCart() {
+        val json = gson.toJson(_cartItems.value)
+        prefs.edit().putString("cart_items", json).apply()
+    }
+
+    private fun loadCart() {
+        val json = prefs.getString("cart_items", null)
+        if (json != null) {
+            try {
+                val type = object : TypeToken<List<CartItem>>() {}.type
+                val items: List<CartItem> = gson.fromJson(json, type)
+                _cartItems.value = items
+            } catch (e: Exception) {
+                _cartItems.value = emptyList()
+            }
+        }
+    }
+
     fun addToCart(product: productItem) {
         val currentItems = _cartItems.value.toMutableList()
         val existingItem = currentItems.find { it.product.id == product.id }
@@ -179,6 +208,7 @@ class AppViewModel(
             currentItems.add(CartItem(product))
         }
         _cartItems.value = currentItems
+        saveCart()
     }
 
     fun removeFromCart(product: productItem) {
@@ -193,10 +223,12 @@ class AppViewModel(
             }
         }
         _cartItems.value = currentItems
+        saveCart()
     }
 
     fun clearCart() {
         _cartItems.value = emptyList()
+        saveCart()
     }
 
     private val _orderState = mutableStateOf(OrderScreenState())
