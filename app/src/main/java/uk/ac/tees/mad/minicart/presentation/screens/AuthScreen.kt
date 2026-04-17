@@ -1,24 +1,30 @@
 package uk.ac.tees.mad.minicart.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
 import uk.ac.tees.mad.minicart.model.UserData
-
-
+import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 
 @Composable
 fun AuthScreen(
@@ -56,6 +62,7 @@ fun AuthScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthScreenContent(
     isLogin: Boolean,
@@ -66,102 +73,134 @@ fun AuthScreenContent(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = if (isLogin) "Welcome Back" else "Create Account",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = image, contentDescription = if (passwordVisible) "Hide password" else "Show password")
-                }
-            },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
-        )
-
-        if (errorMessage != null) {
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-
-        Button(
-            onClick = { onSubmit(email, password) },
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-            enabled = !isLoading
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        // Top Teal background
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.45f)
+                .background(
+                    color = PrimaryTeal,
+                    shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                 )
-            } else {
-                Text(text = if (isLogin) "Login" else "Sign Up")
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(32.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = if (isLogin) "Sign In" else "Sign Up",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        ),
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                        label = { Text("Email Address") },
+                        leadingIcon = { Icon(Icons.Default.Email, "Email") },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = PrimaryTeal,
+                            unfocusedBorderColor = Color.LightGray
+                        ),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                        label = { Text("Password") },
+                        leadingIcon = { Icon(Icons.Default.Lock, "Password") },
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = "Toggle Visibility"
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = PrimaryTeal,
+                            unfocusedBorderColor = Color.LightGray
+                        ),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+                    )
+
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage,
+                            color = MaterialTheme.colorScheme.error,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(bottom = 12.dp).align(Alignment.Start)
+                        )
+                    }
+
+                    Button(
+                        onClick = { onSubmit(email, password) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryTeal),
+                        enabled = !isLoading
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                        } else {
+                            Text(if (isLogin) "Login" else "Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+
+                    TextButton(
+                        onClick = onToggleMode,
+                        modifier = Modifier.padding(top = 16.dp)
+                    ) {
+                        Text(
+                            text = if (isLogin) "Register" else "Back to Login",
+                            color = PrimaryTeal,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = if (isLogin) "Don't have an account? Sign up" else "Already have an account? Login",
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.clickable { onToggleMode() }
-        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AuthScreenLoginPreview() {
-    MaterialTheme {
-        AuthScreenContent(
-            isLogin = true,
-            onToggleMode = {},
-            isLoading = false,
-            errorMessage = null,
-            onSubmit = { _, _ -> }
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AuthScreenRegisterPreview() {
-    MaterialTheme {
-        AuthScreenContent(
-            isLogin = false,
-            onToggleMode = {},
-            isLoading = false,
-            errorMessage = null,
-            onSubmit = { _, _ -> }
-        )
-    }
+fun AuthPreview() {
+    AuthScreenContent(
+        isLogin = true,
+        onToggleMode = {},
+        isLoading = false,
+        errorMessage = "Invalid credentials",
+        onSubmit = {_, _ ->}
+    )
 }
