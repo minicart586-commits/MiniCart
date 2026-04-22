@@ -1,12 +1,14 @@
 package uk.ac.tees.mad.minicart.presentation.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uk.ac.tees.mad.minicart.ViewModel.OrderScreenState
+import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,12 +53,18 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings") },
+                title = { 
+                    Text(
+                        "Settings",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = PrimaryTeal
                         )
                     }
                 }
@@ -65,22 +74,46 @@ fun SettingsScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
+                .background(Color(0xFFF9F9F9))
                 .padding(paddingValues)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            SettingsItem(
-                title = "Clear cart cache",
-                icon = Icons.Default.Delete,
-                onClick = onClearCacheClick,
-                color = MaterialTheme.colorScheme.onSurface
+            Text(
+                text = "Account",
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.Gray,
+                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
             )
-
+            
             SettingsItem(
                 title = "Logout",
                 icon = Icons.Default.ExitToApp,
                 onClick = onLogoutClick,
                 color = MaterialTheme.colorScheme.error
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Data Management",
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.Gray,
+                modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
+            )
+
+            SettingsItem(
+                title = "Clear Cart Cache",
+                icon = Icons.Default.Delete,
+                onClick = onClearCacheClick,
+                color = Color.Black
+            )
+
+            SettingsItem(
+                title = "About MiniCart",
+                icon = Icons.Default.Info,
+                onClick = { /* Could show a dialog */ },
+                color = Color.Black
             )
         }
     }
@@ -95,30 +128,33 @@ fun SettingsItem(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        modifier = Modifier.fillMaxWidth()
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        modifier = Modifier.fillMaxWidth(),
+        tonalElevation = 1.dp,
+        shadowElevation = 1.dp
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(18.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = color,
+                tint = if (color == Color.Black) PrimaryTeal else color,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.sp
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                    color = color
                 ),
-                color = color
+                modifier = Modifier.weight(1f)
             )
         }
     }
