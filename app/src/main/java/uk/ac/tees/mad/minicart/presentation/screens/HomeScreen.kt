@@ -1,6 +1,6 @@
 package uk.ac.tees.mad.minicart.presentation.screens
 
-import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,6 +38,7 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+// ... existing code ...
     val state by viewModel.productsScreenState
     var selectedProduct by remember { mutableStateOf<productItem?>(null) }
     var showDialog by remember { mutableStateOf(false) }
@@ -47,43 +48,43 @@ fun HomeScreen(
         viewModel.getProducts()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        "MiniCart", 
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryTeal
-                        )
-                    ) 
-                },
-                actions = {
-                    IconButton(onClick = onCartClick) {
-                        val cartItems by viewModel.cartItems
-                        BadgedBox(
-                            badge = {
-                                if (cartItems.isNotEmpty()) {
-                                    Badge(containerColor = PrimaryTeal) { 
-                                        Text(cartItems.sumOf { it.quantity }.toString(), color = Color.White) 
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = PrimaryTeal)
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-            )
-        }
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
         Column(
             modifier = modifier
-                .padding(paddingValues)
+                .padding(top = paddingValues.calculateTopPadding())
                 .fillMaxSize()
         ) {
+            // Custom Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "MiniCart",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryTeal
+                    )
+                )
+                IconButton(onClick = onCartClick) {
+                    val cartItems by viewModel.cartItems
+                    BadgedBox(
+                        badge = {
+                            if (cartItems.isNotEmpty()) {
+                                Badge(containerColor = PrimaryTeal) {
+                                    Text(cartItems.sumOf { it.quantity }.toString(), color = Color.White)
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = PrimaryTeal)
+                    }
+                }
+            }
+
             // Search Bar
             OutlinedTextField(
                 value = searchQuery,
@@ -94,10 +95,11 @@ fun HomeScreen(
                 placeholder = { Text("Search Products...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 shape = RoundedCornerShape(16.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryTeal,
                     unfocusedBorderColor = Color.LightGray,
-                    containerColor = Color.White
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White
                 ),
                 singleLine = true
             )

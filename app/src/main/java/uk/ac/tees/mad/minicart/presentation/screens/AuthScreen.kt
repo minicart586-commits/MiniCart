@@ -122,9 +122,11 @@ fun AuthScreenContent(
                         label = { Text("Email Address") },
                         leadingIcon = { Icon(Icons.Default.Email, "Email") },
                         shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryTeal,
-                            unfocusedBorderColor = Color.LightGray
+                            unfocusedBorderColor = Color.LightGray,
+                            focusedLabelColor = PrimaryTeal,
+                            cursorColor = PrimaryTeal
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                     )
@@ -144,9 +146,11 @@ fun AuthScreenContent(
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                        colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryTeal,
-                            unfocusedBorderColor = Color.LightGray
+                            unfocusedBorderColor = Color.LightGray,
+                            focusedLabelColor = PrimaryTeal,
+                            cursorColor = PrimaryTeal
                         ),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)

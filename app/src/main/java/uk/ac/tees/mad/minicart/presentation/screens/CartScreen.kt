@@ -2,6 +2,7 @@ package uk.ac.tees.mad.minicart.presentation.screens
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -70,7 +70,7 @@ fun CartScreen(
     LaunchedEffect(orderState.success) {
         if (orderState.success) {
             NotificationHelper.showOrderNotification(context, "ORD-${System.currentTimeMillis()}")
-            android.widget.Toast.makeText(context, "Order Placed Successfully!", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Order Placed Successfully!", Toast.LENGTH_SHORT).show()
             viewModel.resetOrderState()
             onBackClick()
         }
@@ -272,7 +272,11 @@ fun QuantitySelector(
             onClick = onRemove,
             modifier = Modifier.size(28.dp)
         ) {
-            Icon(Icons.Default.Remove, contentDescription = "Decrease", size = 18.dp)
+            Icon(
+                imageVector = Icons.Default.Remove, 
+                contentDescription = "Decrease",
+                modifier = Modifier.size(18.dp)
+            )
         }
         Text(
             text = quantity.toString(),
@@ -286,7 +290,12 @@ fun QuantitySelector(
                 .size(28.dp)
                 .background(PrimaryTeal, CircleShape)
         ) {
-            Icon(Icons.Default.Add, contentDescription = "Increase", tint = Color.White, size = 18.dp)
+            Icon(
+                imageVector = Icons.Default.Add, 
+                contentDescription = "Increase", 
+                tint = Color.White,
+                modifier = Modifier.size(14.dp)
+            )
         }
     }
 }
@@ -316,7 +325,11 @@ fun OrderConfirmDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     IconButton(onClick = onShare) {
-                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color.White)
+                        Icon(
+                            imageVector = Icons.Default.Share, 
+                            contentDescription = "Share", 
+                            tint = Color.White
+                        )
                     }
                 }
                 
@@ -369,14 +382,6 @@ fun OrderConfirmDialog(
             }
         }
     }
-}
-
-private fun Icon(imageVector: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: String, size: androidx.compose.ui.unit.Dp) {
-    Icon(
-        imageVector = imageVector,
-        contentDescription = contentDescription,
-        modifier = Modifier.size(size)
-    )
 }
 
 fun shareOrderSummary(context: Context, items: List<CartItem>, total: Double) {

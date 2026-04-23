@@ -18,8 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
-import uk.ac.tees.mad.minicart.presentation.screens.AuthScreen
-import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
+import uk.ac.tees.mad.minicart.presentation.screens.SplashScreen
 
 @Composable
 fun AppNav(
@@ -34,11 +33,13 @@ fun AppNav(
 
     Scaffold(
         bottomBar = {
+// ... existing bottom bar code ...
             if (showBottomBar) {
                 NavigationBar(
                     containerColor = Color.White,
                     tonalElevation = 8.dp
                 ) {
+// ... items ...
                     NavigationBarItem(
                         selected = currentRoute == NavRoutes.HOME,
                         onClick = { 
@@ -87,13 +88,21 @@ fun AppNav(
                 }
             }
         }
-    ) { paddingValues ->
+    ) {
         NavHost(
             navController = navController,
-            startDestination = if (auth != null) NavRoutes.HOME else NavRoutes.LOGIN,
-            modifier = Modifier.padding(paddingValues)
+            startDestination = NavRoutes.SPLASH,
         ) {
+            composable(NavRoutes.SPLASH) {
+                SplashScreen(onNavigateNext = {
+                    val nextRoute = if (auth != null) NavRoutes.HOME else NavRoutes.LOGIN
+                    navController.navigate(nextRoute) {
+                        popUpTo(NavRoutes.SPLASH) { inclusive = true }
+                    }
+                })
+            }
             composable(NavRoutes.LOGIN) {
+// ... remaining routes ...
                 AuthScreen(
                     viewModel = appViewModel,
                     initialIsLogin = true,

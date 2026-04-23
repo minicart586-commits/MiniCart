@@ -57,10 +57,6 @@ class AppViewModel(
     private val gson = Gson()
     private val prefs = application.getSharedPreferences("cart_prefs", Context.MODE_PRIVATE)
 
-    init {
-        loadCart()
-    }
-
     private val _loginScreenState = mutableStateOf(LogInScreenState())
     val loginScreenState = _loginScreenState
     val auth= FirebaseAuth.getInstance()
@@ -233,6 +229,10 @@ class AppViewModel(
 
     private val _orderState = mutableStateOf(OrderScreenState())
     val orderState = _orderState
+
+    init {
+        loadCart()
+    }
 
     fun placeOrder() {
         viewModelScope.launch {
