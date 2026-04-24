@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import uk.ac.tees.mad.minicart.R
+import androidx.compose.ui.tooling.preview.Preview
 import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 
 @Composable
@@ -21,7 +22,7 @@ fun SplashScreen(onNavigateNext: () -> Unit) {
 
     LaunchedEffect(key1 = true) {
         scale.animateTo(
-            targetValue = 0.8f,
+            targetValue = 1.0f,
             animationSpec = tween(
                 durationMillis = 1000,
                 easing = {
@@ -37,14 +38,20 @@ fun SplashScreen(onNavigateNext: () -> Unit) {
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+
     ) {
         Image(
-            painter = painterResource(id = R.drawable.minicart_icon),
+            painter = painterResource(id = R.drawable.minicart_appicon_bg_removed),
             contentDescription = "Logo",
-            modifier = Modifier.scale(scale.value).size(200.dp)
+            modifier = Modifier.scale(scale.value).size(280.dp)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SplashScreenPreview() {
+    SplashScreen(onNavigateNext = {})
 }
 
 class OvershootInterpolator(private val tension: Float) {

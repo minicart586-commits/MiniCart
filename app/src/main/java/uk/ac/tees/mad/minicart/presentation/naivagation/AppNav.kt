@@ -18,7 +18,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
+import uk.ac.tees.mad.minicart.presentation.screens.AuthScreen
 import uk.ac.tees.mad.minicart.presentation.screens.SplashScreen
+import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 
 @Composable
 fun AppNav(
@@ -29,20 +31,23 @@ fun AppNav(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val showBottomBar = currentRoute in listOf(NavRoutes.HOME, NavRoutes.CART, NavRoutes.SETTINGS)
+    val showBottomBar = currentRoute in listOf(
+        NavRoutes.HOME,
+        NavRoutes.CART,
+        NavRoutes.SETTINGS
+    )
 
     Scaffold(
         bottomBar = {
-// ... existing bottom bar code ...
             if (showBottomBar) {
                 NavigationBar(
                     containerColor = Color.White,
                     tonalElevation = 8.dp
                 ) {
-// ... items ...
+
                     NavigationBarItem(
                         selected = currentRoute == NavRoutes.HOME,
-                        onClick = { 
+                        onClick = {
                             navController.navigate(NavRoutes.HOME) {
                                 popUpTo(NavRoutes.HOME) { inclusive = true }
                             }
@@ -55,9 +60,10 @@ fun AppNav(
                             indicatorColor = PrimaryTeal.copy(alpha = 0.1f)
                         )
                     )
+
                     NavigationBarItem(
                         selected = currentRoute == NavRoutes.CART,
-                        onClick = { 
+                        onClick = {
                             navController.navigate(NavRoutes.CART) {
                                 popUpTo(NavRoutes.HOME)
                             }
@@ -70,9 +76,10 @@ fun AppNav(
                             indicatorColor = PrimaryTeal.copy(alpha = 0.1f)
                         )
                     )
+
                     NavigationBarItem(
                         selected = currentRoute == NavRoutes.SETTINGS,
-                        onClick = { 
+                        onClick = {
                             navController.navigate(NavRoutes.SETTINGS) {
                                 popUpTo(NavRoutes.HOME)
                             }
@@ -88,75 +95,88 @@ fun AppNav(
                 }
             }
         }
-    ) {
-        NavHost(
-            navController = navController,
-            startDestination = NavRoutes.SPLASH,
-        ) {
-            composable(NavRoutes.SPLASH) {
-                SplashScreen(onNavigateNext = {
-                    val nextRoute = if (auth != null) NavRoutes.HOME else NavRoutes.LOGIN
-                    navController.navigate(nextRoute) {
-                        popUpTo(NavRoutes.SPLASH) { inclusive = true }
-                    }
-                })
-            }
-            composable(NavRoutes.LOGIN) {
-// ... remaining routes ...
-                AuthScreen(
-                    viewModel = appViewModel,
-                    initialIsLogin = true,
-                    onLoginSuccess = {
-                        navController.navigate(NavRoutes.HOME) {
-                            popUpTo(NavRoutes.LOGIN) { inclusive = true }
-                        }
-                    }
-                )
-            }
-            composable(NavRoutes.SIGNUP) {
-                AuthScreen(
-                    viewModel = appViewModel,
-                    initialIsLogin = false,
-                    onLoginSuccess = {
-                        navController.navigate(NavRoutes.HOME) {
-                            popUpTo(NavRoutes.SIGNUP) { inclusive = true }
-                        }
-                    }
-                )
-            }
-            composable(NavRoutes.HOME) {
-                if (appViewModel != null) {
-                    uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
-                        viewModel = appViewModel,
-                        onCartClick = { navController.navigate(NavRoutes.CART) },
-                        onSettingsClick = { navController.navigate(NavRoutes.SETTINGS) }
-                    )
-                }
-            }
-            composable(NavRoutes.CART) {
-                if (appViewModel != null) {
-                    uk.ac.tees.mad.minicart.presentation.screens.CartScreen(
-                        viewModel = appViewModel,
-                        onBackClick = { navController.popBackStack() }
-                    )
-                }
-            }
-            composable(NavRoutes.SETTINGS) {
-                if (appViewModel != null) {
-                    uk.ac.tees.mad.minicart.presentation.screens.SettingsScreen(
-                        orderState = appViewModel.orderState.value,
-                        onResetOrderState = { appViewModel.resetOrderState() },
-                        onBackClick = { navController.popBackStack() },
-                        onLogoutClick = {
-                            appViewModel.signout()
-                            navController.navigate(NavRoutes.LOGIN) {
-                                popUpTo(0) { inclusive = true }
+    ) { _ ->
+
+
+        Surface(modifier = Modifier.padding(bottom = 90.dp)) {
+            NavHost(
+                navController = navController,
+                startDestination = NavRoutes.SPLASH
+            ) {
+
+                composable(NavRoutes.SPLASH) {
+                    SplashScreen(
+                        onNavigateNext = {
+                            val nextRoute =
+                                if (auth != null) NavRoutes.HOME else NavRoutes.LOGIN
+
+                            navController.navigate(nextRoute) {
+                                popUpTo(NavRoutes.SPLASH) { inclusive = true }
                             }
-                        },
-                        onClearCacheClick = {
-                            appViewModel.clearCache()
                         }
                     )
+                }
+
+                composable(NavRoutes.LOGIN) {
+                    AuthScreen(
+                        viewModel = appViewModel,
+                        initialIsLogin = true,
+                        onLoginSuccess = {
+                            navController.navigate(NavRoutes.HOME) {
+                                popUpTo(NavRoutes.LOGIN) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable(NavRoutes.SIGNUP) {
+                    AuthScreen(
+                        viewModel = appViewModel,
+                        initialIsLogin = false,
+                        onLoginSuccess = {
+                            navController.navigate(NavRoutes.HOME) {
+                                popUpTo(NavRoutes.SIGNUP) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable(NavRoutes.HOME) {
+                    if (appViewModel != null) {
+                        uk.ac.tees.mad.minicart.presentation.screens.HomeScreen(
+                            viewModel = appViewModel,
+                            onCartClick = { navController.navigate(NavRoutes.CART) },
+                            onSettingsClick = { navController.navigate(NavRoutes.SETTINGS) }
+                        )
+                    }
+                }
+
+                composable(NavRoutes.CART) {
+                    if (appViewModel != null) {
+                        uk.ac.tees.mad.minicart.presentation.screens.CartScreen(
+                            viewModel = appViewModel,
+                            onBackClick = { navController.popBackStack() }
+                        )
+                    }
+                }
+
+                composable(NavRoutes.SETTINGS) {
+                    if (appViewModel != null) {
+                        uk.ac.tees.mad.minicart.presentation.screens.SettingsScreen(
+                            orderState = appViewModel.orderState.value,
+                            onResetOrderState = { appViewModel.resetOrderState() },
+                            onBackClick = { navController.popBackStack() },
+                            onLogoutClick = {
+                                appViewModel.signout()
+                                navController.navigate(NavRoutes.LOGIN) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            },
+                            onClearCacheClick = {
+                                appViewModel.clearCache()
+                            }
+                        )
+                    }
                 }
             }
         }

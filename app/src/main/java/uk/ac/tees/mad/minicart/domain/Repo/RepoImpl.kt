@@ -115,7 +115,15 @@ class RepoImpl: Repo {
         val db = FirebaseFirestore.getInstance()
         val order = hashMapOf(
             "userId" to user.uid,
-            "items" to cartItems,
+            "items" to cartItems.map { 
+                mapOf(
+                    "productId" to it.product.id,
+                    "title" to it.product.title,
+                    "price" to it.product.price,
+                    "quantity" to it.quantity,
+                    "image" to it.product.image
+                )
+            },
             "timestamp" to System.currentTimeMillis()
         )
 

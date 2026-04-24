@@ -76,6 +76,8 @@ fun CartScreen(
         }
     }
 
+    var itemToDelete by remember { mutableStateOf<CartItem?>(null) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -137,7 +139,7 @@ fun CartScreen(
                             if (orderState.isLoading) {
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
                             } else {
-                                Text("Place Order", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                                Text("Proceed to Checkout", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -170,11 +172,31 @@ fun CartScreen(
                         PremiumCartItemRow(
                             item = item,
                             onAdd = { viewModel.addToCart(item.product) },
-                            onRemove = { viewModel.removeFromCart(item.product) }
+                            onRemove = { 
+                                if (item.quantity > 1) {
+                                    viewModel.removeFromCart(item.product)
+                                } else {
+                                    itemToDelete = item
+                                }
+                            },
+                            onDeleteEntirely = {
+                                itemToDelete = item
+                            }
                         )
                     }
                 }
             }
+        }
+
+        if (itemToDelete != null) {
+            DeleteItemConfirmDialog(
+                item = itemToDelete!!,
+                onDismiss = { itemToDelete = null },
+                onConfirm = {
+                    viewModel.deleteEntireItemFromCart(itemToDelete!!.product)
+                    itemToDelete = null
+                }
+            )
         }
 
         if (showConfirmDialog) {
@@ -196,7 +218,8 @@ fun CartScreen(
 fun PremiumCartItemRow(
     item: CartItem,
     onAdd: () -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    onDeleteEntirely: () -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
@@ -247,8 +270,8 @@ fun PremiumCartItemRow(
                         onRemove = onRemove
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = onRemove) {
-                        Text("Remove", color = Color.Gray, fontSize = 12.sp)
+                    TextButton(onClick = onDeleteEntirely) {
+                        Text("Remove", color = Color.Red.copy(alpha = 0.7f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -265,39 +288,74 @@ fun QuantitySelector(
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(Color(0xFFF0F0F0), CircleShape)
-            .padding(horizontal = 4.dp, vertical = 2.dp)
+            .background(Color(0xFFF5F5F5), RoundedCornerShape(24.dp))
+            .padding(4.dp)
     ) {
         IconButton(
             onClick = onRemove,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier
+                .size(32.dp)
+                .background(Color.White, CircleShape),
+            colors = IconButtonDefaults.iconButtonColors(contentColor = PrimaryTeal)
         ) {
-            Icon(
-                imageVector = Icons.Default.Remove, 
-                contentDescription = "Decrease",
-                modifier = Modifier.size(18.dp)
-            )
+            Icon(Icons.Default.Remove, contentDescription = "Decrease", modifier = Modifier.size(16.dp))
         }
+        
         Text(
             text = quantity.toString(),
-            modifier = Modifier.padding(horizontal = 8.dp),
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
+            modifier = Modifier.padding(horizontal = 12.dp),
+            fontWeight = FontWeight.ExtraBold,
+            fontSize = 16.sp,
+            color = Color.Black
         )
+        
         IconButton(
             onClick = onAdd,
             modifier = Modifier
-                .size(28.dp)
-                .background(PrimaryTeal, CircleShape)
+                .size(32.dp)
+                .background(PrimaryTeal, CircleShape),
+            colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
         ) {
-            Icon(
-                imageVector = Icons.Default.Add, 
-                contentDescription = "Increase", 
-                tint = Color.White,
-                modifier = Modifier.size(14.dp)
-            )
+            Icon(Icons.Default.Add, contentDescription = "Increase", modifier = Modifier.size(16.dp))
         }
     }
+}
+
+@Composable
+fun DeleteItemConfirmDialog(
+    item: CartItem,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Remove Item?") },
+        text = {
+            Column {
+                Text("Are you sure you want to remove this item from your cart?")
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = item.product.image,
+                        contentDescription = null,
+                        modifier = Modifier.size(50.dp).clip(RoundedCornerShape(8.dp))
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(item.product.title, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Remove", color = Color.Red)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 @Composable

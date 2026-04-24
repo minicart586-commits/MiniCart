@@ -54,7 +54,7 @@ fun HomeScreen(
                 .padding(top = paddingValues.calculateTopPadding())
                 .fillMaxSize()
         ) {
-            // Custom Header
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,7 +85,7 @@ fun HomeScreen(
                 }
             }
 
-            // Search Bar
+
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
@@ -106,11 +106,12 @@ fun HomeScreen(
 
             Box(modifier = Modifier.weight(1f)) {
                 when {
-                    state.isLoading -> {
+                    state.isLoading -> {Row(modifier = Modifier.align (Alignment.Center)) {
                         CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
+
                             color = PrimaryTeal
                         )
+                    }
                     }
                     state.error != null -> {
                         Text(

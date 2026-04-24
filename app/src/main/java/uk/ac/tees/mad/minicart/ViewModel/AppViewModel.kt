@@ -222,6 +222,13 @@ class AppViewModel(
         saveCart()
     }
 
+    fun deleteEntireItemFromCart(product: productItem) {
+        val currentItems = _cartItems.value.toMutableList()
+        currentItems.removeAll { it.product.id == product.id }
+        _cartItems.value = currentItems
+        saveCart()
+    }
+
     fun clearCart() {
         _cartItems.value = emptyList()
         saveCart()
