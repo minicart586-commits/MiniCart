@@ -51,7 +51,9 @@ fun SplashScreen(onNavigateNext: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun SplashScreenPreview() {
-    SplashScreen(onNavigateNext = {})
+    uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme {
+        SplashScreen(onNavigateNext = {})
+    }
 }
 
 class OvershootInterpolator(private val tension: Float) {

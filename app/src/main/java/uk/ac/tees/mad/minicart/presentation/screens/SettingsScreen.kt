@@ -163,7 +163,7 @@ fun SettingsItem(
 @Preview(showBackground = true)
 @Composable
 fun SettingsScreenPreview() {
-    MaterialTheme {
+    uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme {
         SettingsScreen(
             orderState = OrderScreenState(),
             onResetOrderState = {},

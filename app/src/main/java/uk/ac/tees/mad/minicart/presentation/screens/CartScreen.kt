@@ -32,6 +32,7 @@ import uk.ac.tees.mad.minicart.model.CartItem
 import uk.ac.tees.mad.minicart.model.productItem
 import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 import uk.ac.tees.mad.minicart.util.NotificationHelper
+import androidx.compose.ui.tooling.preview.Preview
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -39,7 +40,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
     viewModel: AppViewModel,
@@ -48,12 +48,6 @@ fun CartScreen(
     val cartItems by viewModel.cartItems
     val orderState by viewModel.orderState
     val context = LocalContext.current
-
-    val totalPrice = remember(cartItems) {
-        cartItems.sumOf { it.product.price.toDouble() * it.quantity }
-    }
-
-    var showConfirmDialog by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -76,6 +70,36 @@ fun CartScreen(
         }
     }
 
+    CartScreenContent(
+        cartItems = cartItems,
+        orderState = orderState,
+        onBackClick = onBackClick,
+        onAddToCart = { viewModel.addToCart(it) },
+        onRemoveFromCart = { viewModel.removeFromCart(it) },
+        onDeleteEntireItem = { viewModel.deleteEntireItemFromCart(it) },
+        onPlaceOrder = { viewModel.placeOrder() },
+        onResetOrderState = { viewModel.resetOrderState() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CartScreenContent(
+    cartItems: List<CartItem>,
+    orderState: uk.ac.tees.mad.minicart.ViewModel.OrderScreenState,
+    onBackClick: () -> Unit,
+    onAddToCart: (productItem) -> Unit,
+    onRemoveFromCart: (productItem) -> Unit,
+    onDeleteEntireItem: (productItem) -> Unit,
+    onPlaceOrder: () -> Unit,
+    onResetOrderState: () -> Unit
+) {
+    val context = LocalContext.current
+    val totalPrice = remember(cartItems) {
+        cartItems.sumOf { it.product.price.toDouble() * it.quantity }
+    }
+
+    var showConfirmDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<CartItem?>(null) }
 
     Scaffold(
@@ -171,10 +195,10 @@ fun CartScreen(
                     items(cartItems) { item ->
                         PremiumCartItemRow(
                             item = item,
-                            onAdd = { viewModel.addToCart(item.product) },
+                            onAdd = { onAddToCart(item.product) },
                             onRemove = { 
                                 if (item.quantity > 1) {
-                                    viewModel.removeFromCart(item.product)
+                                    onRemoveFromCart(item.product)
                                 } else {
                                     itemToDelete = item
                                 }
@@ -193,7 +217,7 @@ fun CartScreen(
                 item = itemToDelete!!,
                 onDismiss = { itemToDelete = null },
                 onConfirm = {
-                    viewModel.deleteEntireItemFromCart(itemToDelete!!.product)
+                    onDeleteEntireItem(itemToDelete!!.product)
                     itemToDelete = null
                 }
             )
@@ -205,12 +229,33 @@ fun CartScreen(
                 total = totalPrice,
                 onDismiss = { showConfirmDialog = false },
                 onConfirm = { 
-                    viewModel.placeOrder()
+                    onPlaceOrder()
                     showConfirmDialog = false
                 },
                 onShare = { shareOrderSummary(context, cartItems, totalPrice) }
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CartScreenPreview() {
+    val mockItems = listOf(
+        CartItem(productItem(id = 1, title = "Product 1", price = 10.0, description = "Description 1", image = "", category = "Category 1"), 2),
+        CartItem(productItem(id = 2, title = "Product 2", price = 20.0, description = "Description 2", image = "", category = "Category 2"), 1)
+    )
+    uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme {
+        CartScreenContent(
+            cartItems = mockItems,
+            orderState = uk.ac.tees.mad.minicart.ViewModel.OrderScreenState(),
+            onBackClick = {},
+            onAddToCart = {},
+            onRemoveFromCart = {},
+            onDeleteEntireItem = {},
+            onPlaceOrder = {},
+            onResetOrderState = {}
+        )
     }
 }
 
@@ -415,7 +460,7 @@ fun OrderConfirmDialog(
                     if (cartItems.size > 3) {
                         Text("... and ${cartItems.size - 3} more", fontSize = 12.sp, color = Color.Gray)
                     }
-                    Divider(Modifier.padding(vertical = 8.dp))
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween

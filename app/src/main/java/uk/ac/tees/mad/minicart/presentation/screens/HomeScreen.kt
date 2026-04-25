@@ -21,16 +21,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import uk.ac.tees.mad.minicart.ViewModel.ProductsScreenState
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
 import uk.ac.tees.mad.minicart.ViewModel.AppViewModel
 import uk.ac.tees.mad.minicart.model.productItem
+import uk.ac.tees.mad.minicart.model.CartItem
 import uk.ac.tees.mad.minicart.ui.theme.PrimaryTeal
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: AppViewModel,
@@ -38,15 +40,36 @@ fun HomeScreen(
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-// ... existing code ...
     val state by viewModel.productsScreenState
-    var selectedProduct by remember { mutableStateOf<productItem?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    val cartItems by viewModel.cartItems
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getProducts()
     }
+
+    HomeScreenContent(
+        state = state,
+        cartItems = cartItems,
+        onCartClick = onCartClick,
+        onAddToCart = { viewModel.addToCart(it) },
+        onSearchQueryChange = { /* Search is handled locally in Content for now */ },
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreenContent(
+    state: ProductsScreenState,
+    cartItems: List<CartItem>,
+    onCartClick: () -> Unit,
+    onAddToCart: (productItem) -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var selectedProduct by remember { mutableStateOf<productItem?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+    var searchQuery by remember { mutableStateOf("") }
 
     Scaffold { paddingValues ->
         Column(
@@ -70,7 +93,6 @@ fun HomeScreen(
                     )
                 )
                 IconButton(onClick = onCartClick) {
-                    val cartItems by viewModel.cartItems
                     BadgedBox(
                         badge = {
                             if (cartItems.isNotEmpty()) {
@@ -88,7 +110,10 @@ fun HomeScreen(
 
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { searchQuery = it },
+                onValueChange = { 
+                    searchQuery = it
+                    onSearchQueryChange(it)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -106,12 +131,12 @@ fun HomeScreen(
 
             Box(modifier = Modifier.weight(1f)) {
                 when {
-                    state.isLoading -> {Row(modifier = Modifier.align (Alignment.Center)) {
-                        CircularProgressIndicator(
-
-                            color = PrimaryTeal
-                        )
-                    }
+                    state.isLoading -> {
+                        Row(modifier = Modifier.align(Alignment.Center)) {
+                            CircularProgressIndicator(
+                                color = PrimaryTeal
+                            )
+                        }
                     }
                     state.error != null -> {
                         Text(
@@ -137,7 +162,7 @@ fun HomeScreen(
                                         showDialog = true
                                     },
                                     onAddToCart = { 
-                                        viewModel.addToCart(product)
+                                        onAddToCart(product)
                                     }
                                 )
                             }
@@ -152,11 +177,29 @@ fun HomeScreen(
                 product = selectedProduct!!,
                 onDismiss = { showDialog = false },
                 onAddToCart = { 
-                    viewModel.addToCart(selectedProduct!!)
+                    onAddToCart(selectedProduct!!)
                     showDialog = false 
                 }
             )
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    val mockProducts = listOf(
+        productItem(id = 1, title = "Product 1", price = 10.0, description = "Description 1", image = "", category = "Category 1"),
+        productItem(id = 2, title = "Product 2", price = 20.0, description = "Description 2", image = "", category = "Category 2")
+    )
+    uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme {
+        HomeScreenContent(
+            state = ProductsScreenState(products = mockProducts),
+            cartItems = emptyList(),
+            onCartClick = {},
+            onAddToCart = {},
+            onSearchQueryChange = {}
+        )
     }
 }
 

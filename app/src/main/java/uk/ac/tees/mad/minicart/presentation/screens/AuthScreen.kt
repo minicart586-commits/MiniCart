@@ -200,11 +200,13 @@ fun AuthScreenContent(
 @Preview(showBackground = true)
 @Composable
 fun AuthPreview() {
-    AuthScreenContent(
-        isLogin = true,
-        onToggleMode = {},
-        isLoading = false,
-        errorMessage = "Invalid credentials",
-        onSubmit = {_, _ ->}
-    )
+    uk.ac.tees.mad.minicart.ui.theme.MiniCartTheme {
+        AuthScreenContent(
+            isLogin = true,
+            onToggleMode = {},
+            isLoading = false,
+            errorMessage = "Invalid credentials",
+            onSubmit = {_, _ ->}
+        )
+    }
 }
