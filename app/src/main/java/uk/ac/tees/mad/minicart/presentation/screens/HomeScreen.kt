@@ -132,7 +132,10 @@ fun HomeScreenContent(
             Box(modifier = Modifier.weight(1f)) {
                 when {
                     state.isLoading -> {
-                        Row(modifier = Modifier.align(Alignment.Center)) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
                             CircularProgressIndicator(
                                 color = PrimaryTeal
                             )

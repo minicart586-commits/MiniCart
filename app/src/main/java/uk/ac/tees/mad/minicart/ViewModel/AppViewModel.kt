@@ -266,6 +266,10 @@ class AppViewModel(
 
     fun signout() {
         auth.signOut()
+        resetLoginState()
+        resetSignupState()
+        _cartItems.value = emptyList() // Clear cart on logout as well for security
+        saveCart()
     }
 
     fun clearCache() {

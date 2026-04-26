@@ -13,6 +13,7 @@ import uk.ac.tees.mad.minicart.model.ResultState
 import uk.ac.tees.mad.minicart.model.UserData
 import uk.ac.tees.mad.minicart.model.CartItem
 import uk.ac.tees.mad.minicart.model.productItem
+import retrofit2.Response
 
 class RepoImpl: Repo {
     private val auth = FirebaseAuth.getInstance()
@@ -83,8 +84,14 @@ class RepoImpl: Repo {
         emit(ResultState.Loading)
         try {
             val response = ApiBuilder.provedApi.getProducts()
-            Log.d("RepoImpl", "Products fetched successfully: ${response.size} items")
-            emit(ResultState.Succes(response))
+            if (response.isSuccessful) {
+                val products = response.body()?.products ?: emptyList()
+                Log.d("RepoImpl", "Products fetched successfully: ${products.size} items")
+                emit(ResultState.Succes(products))
+            } else {
+                Log.e("RepoImpl", "Error fetching products: ${response.message()}")
+                emit(ResultState.error(response.message() ?: "Failed to fetch products"))
+            }
         } catch (e: Exception) {
             Log.e("RepoImpl", "Error fetching products", e)
             emit(ResultState.error(e.localizedMessage ?: "Unknown error"))
