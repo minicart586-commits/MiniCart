@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -53,6 +55,7 @@ fun HomeScreen(
         onCartClick = onCartClick,
         onAddToCart = { viewModel.addToCart(it) },
         onSearchQueryChange = { /* Search is handled locally in Content for now */ },
+        onRetry = { viewModel.getProducts() },
         modifier = modifier
     )
 }
@@ -65,6 +68,7 @@ fun HomeScreenContent(
     onCartClick: () -> Unit,
     onAddToCart: (productItem) -> Unit,
     onSearchQueryChange: (String) -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedProduct by remember { mutableStateOf<productItem?>(null) }
@@ -152,22 +156,63 @@ fun HomeScreenContent(
                         val filteredProducts = state.products!!.filter { 
                             it.title.contains(searchQuery, ignoreCase = true) 
                         }
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(filteredProducts) { product ->
-                                HorizontalProductCard(
-                                    product = product,
-                                    onClick = { 
-                                        selectedProduct = product
-                                        showDialog = true
-                                    },
-                                    onAddToCart = { 
-                                        onAddToCart(product)
+                        if (filteredProducts.isEmpty() && !state.isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(32.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ShoppingBag,
+                                        contentDescription = null,
+                                        tint = PrimaryTeal.copy(alpha = 0.3f),
+                                        modifier = Modifier.size(72.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "No products found",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Check your connection and try again",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Button(
+                                        onClick = { onRetry() },
+                                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryTeal)
+                                    ) {
+                                        Text("Retry")
                                     }
-                                )
+                                }
+                            }
+                        } else {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(filteredProducts) { product ->
+                                    HorizontalProductCard(
+                                        product = product,
+                                        onClick = { 
+                                            selectedProduct = product
+                                            showDialog = true
+                                        },
+                                        onAddToCart = { 
+                                            onAddToCart(product)
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -201,7 +246,8 @@ fun HomeScreenPreview() {
             cartItems = emptyList(),
             onCartClick = {},
             onAddToCart = {},
-            onSearchQueryChange = {}
+            onSearchQueryChange = {},
+            onRetry = {}
         )
     }
 }

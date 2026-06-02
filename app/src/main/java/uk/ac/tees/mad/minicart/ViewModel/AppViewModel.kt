@@ -103,7 +103,7 @@ class AppViewModel(
                     }
                     is ResultState.Succes -> {
                         _signupScreenState.value = SignUpScreenState(
-                            success = false,
+                            success = true,
                             userdata = result.data
                         )
                     }
