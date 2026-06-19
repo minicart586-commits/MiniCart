@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ fun AppNav(
     val auth = FirebaseAuth.getInstance().currentUser
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val cartCount = appViewModel?.cartItems?.value?.size ?: 0
 
     val showBottomBar = currentRoute in listOf(
         NavRoutes.HOME,
@@ -68,7 +70,31 @@ fun AppNav(
                                 popUpTo(NavRoutes.HOME)
                             }
                         },
-                        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = "Cart") },
+                        icon = {
+                            BadgedBox(
+                                badge = {
+                                    if (cartCount > 0) {
+                                        Badge(
+                                            containerColor = PrimaryTeal
+                                        ) {
+                                            Text(
+                                                text = cartCount.toString(),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = Color.White
+                                            )
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (currentRoute == NavRoutes.CART)
+                                        Icons.Default.ShoppingCart
+                                    else
+                                        Icons.Outlined.ShoppingCart,
+                                    contentDescription = "Cart"
+                                )
+                            }
+                        },
                         label = { Text("Cart") },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = PrimaryTeal,
