@@ -48,6 +48,10 @@ fun AuthScreen(
         onToggleMode = { isLogin = !isLogin },
         isLoading = if (isLogin) loginState?.isLoading == true else signupState?.isLoading == true,
         errorMessage = if (isLogin) loginState?.error else signupState?.error,
+        emailError = viewModel?.emailError ?: "",
+        passwordError = viewModel?.passwordError ?: "",
+        onClearEmailError = { viewModel?.emailError = "" },
+        onClearPasswordError = { viewModel?.passwordError = "" },
         onSubmit = { email, password ->
             val userData = UserData(
                 email = email,
@@ -69,6 +73,10 @@ fun AuthScreenContent(
     onToggleMode: () -> Unit,
     isLoading: Boolean,
     errorMessage: String?,
+    emailError: String,
+    passwordError: String,
+    onClearEmailError: () -> Unit,
+    onClearPasswordError: () -> Unit,
     onSubmit: (String, String) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
@@ -117,9 +125,18 @@ fun AuthScreenContent(
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = { 
+                            email = it
+                            onClearEmailError()
+                        },
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         label = { Text("Email Address") },
+                        isError = emailError.isNotEmpty(),
+                        supportingText = {
+                            if (emailError.isNotEmpty()) {
+                                Text(text = emailError, color = MaterialTheme.colorScheme.error)
+                            }
+                        },
                         leadingIcon = { Icon(Icons.Default.Email, "Email") },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
@@ -133,9 +150,18 @@ fun AuthScreenContent(
 
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = { 
+                            password = it
+                            onClearPasswordError()
+                        },
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
                         label = { Text("Password") },
+                        isError = passwordError.isNotEmpty(),
+                        supportingText = {
+                            if (passwordError.isNotEmpty()) {
+                                Text(text = passwordError, color = MaterialTheme.colorScheme.error)
+                            }
+                        },
                         leadingIcon = { Icon(Icons.Default.Lock, "Password") },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -206,6 +232,10 @@ fun AuthPreview() {
             onToggleMode = {},
             isLoading = false,
             errorMessage = "Invalid credentials",
+            emailError = "",
+            passwordError = "",
+            onClearEmailError = {},
+            onClearPasswordError = {},
             onSubmit = {_, _ ->}
         )
     }

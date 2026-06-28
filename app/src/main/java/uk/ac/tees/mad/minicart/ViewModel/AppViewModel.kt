@@ -2,7 +2,9 @@ package uk.ac.tees.mad.minicart.ViewModel
 
 import android.app.Application
 import android.content.Context
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -61,8 +63,30 @@ class AppViewModel(
     val loginScreenState = _loginScreenState
     val auth= FirebaseAuth.getInstance()
 
+    var emailError by mutableStateOf("")
+    var passwordError by mutableStateOf("")
+
+    fun validateAuthInput(email: String, password: String): Boolean {
+        var valid = true
+
+        emailError = when {
+            email.isBlank() -> { valid = false; "Email cannot be empty" }
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() ->
+                { valid = false; "Enter a valid email address" }
+            else -> ""
+        }
+
+        passwordError = when {
+            password.isBlank() -> { valid = false; "Password cannot be empty" }
+            password.length < 6 -> { valid = false; "Password must be at least 6 characters" }
+            else -> ""
+        }
+
+        return valid
+    }
 
     fun loginUser(userData: UserData) {
+        if (!validateAuthInput(userData.email, userData.password)) return
         viewModelScope.launch {
             repo.loginuserwithemailandpassword(userData).collect { result ->
                 when (result) {
@@ -87,6 +111,8 @@ class AppViewModel(
 
     fun resetLoginState() {
         _loginScreenState.value = LogInScreenState()
+        emailError = ""
+        passwordError = ""
     }
 
 
@@ -95,6 +121,7 @@ class AppViewModel(
     val signupScreenState = _signupScreenState
 
     fun  registerUser(userData: UserData) {
+        if (!validateAuthInput(userData.email, userData.password)) return
         viewModelScope.launch {
             repo.registeruserwithemailandpassword(userData).collect { result ->
                 when (result) {
@@ -119,6 +146,8 @@ class AppViewModel(
 
     fun resetSignupState() {
         _signupScreenState.value = SignUpScreenState()
+        emailError = ""
+        passwordError = ""
     }
 
     private val _productsScreenState = mutableStateOf(ProductsScreenState())
