@@ -214,12 +214,24 @@ fun CartScreenContent(
                     }
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(cartItems) { item ->
+                Column(modifier = Modifier.fillMaxSize()) {
+                    val totalItems = cartItems.sumOf { it.quantity }
+
+                    Text(
+                        text = "$totalItems ${if (totalItems == 1) "item" else "items"} in cart",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(cartItems) { item ->
                         PremiumCartItemRow(
                             item = item,
                             onAdd = { onAddToCart(item.product) },
@@ -235,6 +247,7 @@ fun CartScreenContent(
                             }
                         )
                     }
+                }
                 }
             }
         }
